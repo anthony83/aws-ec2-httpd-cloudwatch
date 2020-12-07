@@ -4,7 +4,7 @@ templatepath="file:///home/anthonyn/devops/aws/create-instance.yaml"
 region="ap-southeast-2"
 stackname="createinstance"
 keyname="httpd-server"
-sleeptime=60
+sleeptime=65
 
 aws cloudformation create-stack --stack-name $stackname --template-body $templatepath --parameters ParameterKey=KeyPairName,ParameterValue=$keyname --capabilities CAPABILITY_NAMED_IAM --output table
 
