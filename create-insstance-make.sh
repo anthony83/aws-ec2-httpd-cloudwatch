@@ -1,6 +1,6 @@
 #!/bin/bash
 
-templatepath="file:///home/anthonyn/devops/aws/create-instance.yaml"
+templatepath="file:////home/anthonyn/devops/aws/httpd-cloudwatch-logging-ec2/create-instance.yaml"
 region="ap-southeast-2"
 stackname="createinstance"
 keyname="httpd-server"

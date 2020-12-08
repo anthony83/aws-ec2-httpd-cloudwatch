@@ -92,7 +92,7 @@ Resources:
             systemctl enable awslogsd
             
       SecurityGroups:
-        - !Ref EC2SecurityGrotroopaup
+        - !Ref EC2SecurityGroup
       Tags:
         - Key: Name
           Value: Web Server
