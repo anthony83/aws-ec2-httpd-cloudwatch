@@ -1,7 +1,6 @@
 Description: 
   Template to provision an EC2 Instance with httpd installed.
 
-
 Parameters:  
   InstanceType:
     Description: EC2 instance type
@@ -27,7 +26,7 @@ Mappings:
     eu-west-1:
       AMI: ami-014ce76919b528bff
     ap-southeast-2:
-      AMI: ami-09f765d333a8ebb4b
+      AMI: ami-06ce513624b435a22
     ap-northeast-1:
       AMI: ami-034968955444c1fd9
 
@@ -80,28 +79,42 @@ Resources:
       UserData:
         Fn::Base64: |
             #!/bin/bash -xe
+            iptables -A OUTPUT -m owner ! --uid-owner root -d 169.254.169.254 -j DROP
             yum update -y
             yum install -y httpd
+            yum install -y git
             service httpd start
             chkconfig httpd on
             yum install -y awslogs
             sed -i 's/us-east-1/ap-southeast-2/g' /etc/awslogs/awscli.conf
             sed -i '/^log_group_name/d' /etc/awslogs/awslogs.conf
             sed -i '$s/$/\nlog_group_name = httpd/' /etc/awslogs/awslogs.conf
+            sleep 5
+            git clone https://github.com/cloudacademy/static-website-example.git
+            cp -r static-website-example/* /var/www/html/
+            sleep 5
             service awslogsd start
-            systemctl enable awslogsd
-            
+            systemctl enable awslogsd         
+ 
       SecurityGroups:
         - !Ref EC2SecurityGroup
       Tags:
         - Key: Name
           Value: Web Server
         - Key: Type
-          Value: Worker Instance
-
+          Value: Web Server Instance
+          
+  IPAddress:
+    Type: AWS::EC2::EIP
+  IPAssoc:
+    Type: AWS::EC2::EIPAssociation
+    Properties:
+      InstanceId: !Ref 'Ec2Instance'
+      EIP: !Ref 'IPAddress'
+      
 Outputs:
   InstanceId:
-    Description: InstanceId of the first EC2 instance
+    Description: InstanceId of the EC2 instance
     Value: !Ref Ec2Instance
   PublicIP:
     Description: Public IP address of the EC2 instance

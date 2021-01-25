@@ -2,16 +2,16 @@
 
 templatepath="file:////home/anthonyn/devops/aws/httpd-cloudwatch-logging-ec2/create-instance.yaml"
 region="ap-southeast-2"
-stackname="createinstance"
+stackname="createinstanc2"
 keyname="httpd-server"
-sleeptime=65
+sleeptime=45
 
 aws cloudformation create-stack --stack-name $stackname --template-body $templatepath --parameters ParameterKey=KeyPairName,ParameterValue=$keyname --capabilities CAPABILITY_NAMED_IAM --output table
 
 printf "%s\n"
 printf "running build please standby..."
 
-sleep $sleeptime
+#sleep $sleeptime
 
 instanceid=$(aws cloudformation --region $region describe-stacks --stack-name $stackname --query "Stacks[0].Outputs[0].OutputValue")
 instanceip=$(aws cloudformation --region $region describe-stacks --stack-name $stackname --query "Stacks[0].Outputs[1].OutputValue")
