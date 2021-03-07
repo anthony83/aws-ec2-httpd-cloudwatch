@@ -2,7 +2,7 @@
 
 templatepath="file:////home/anthonyn/devops/aws/httpd-cloudwatch-logging-ec2/create-instance.yaml"
 region="ap-southeast-2"
-stackname="createinstanc2"
+stackname="createinstance"
 keyname="httpd-server"
 sleeptime=45
 

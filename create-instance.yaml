@@ -43,7 +43,7 @@ Resources:
             Action: ['sts:AssumeRole']
       Path: /
       ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/AdministratorAccess
+        - arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
 
   Ec2AdminInstanceProfile:
     Type: AWS::IAM::InstanceProfile
