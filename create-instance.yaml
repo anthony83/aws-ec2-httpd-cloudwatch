@@ -32,7 +32,7 @@ Mappings:
 
 Resources:
 
-  Ec2AdminIamRole:
+  EC2CloudwatchIAMRole: 
     Type: AWS::IAM::Role
     Properties: 
       AssumeRolePolicyDocument: 
@@ -45,11 +45,11 @@ Resources:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
 
-  Ec2AdminInstanceProfile:
+  EC2InstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Properties: 
       Path: /
-      Roles: [!Ref Ec2AdminIamRole]        
+      Roles: [!Ref EC2CloudwatchIAMRole]        
         
 
   EC2SecurityGroup:
@@ -74,8 +74,15 @@ Resources:
         - RegionMap
         - !Ref 'AWS::Region'
         - AMI
-      IamInstanceProfile: !Ref Ec2AdminInstanceProfile  
+      IamInstanceProfile: !Ref EC2InstanceProfile  
       KeyName: !Ref KeyPairName
+      BlockDeviceMappings:
+        - DeviceName: /dev/xvda
+          Ebs:
+            VolumeType: gp3
+            VolumeSize: '30'
+            DeleteOnTermination: 'true'
+            Encrypted: 'true'
       UserData:
         Fn::Base64: |
             #!/bin/bash -xe
