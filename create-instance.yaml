@@ -66,7 +66,7 @@ Resources:
           ToPort: 22
           CidrIp: 0.0.0.0/0  
           
-  Ec2Instance:
+  EC2Instance:
     Type: AWS::EC2::Instance
     Metadata:
       AWS::CloudFormation::Init:
@@ -86,9 +86,9 @@ Resources:
                   sed -i 's/us-east-1/ap-southeast-2/g' /etc/awslogs/awscli.conf
                   sed -i '/^log_group_name/d' /etc/awslogs/awslogs.conf
                   sed -i '$s/$/\nlog_group_name = httpd/' /etc/awslogs/awslogs.conf
-                  service awslogsd start
-                  systemctl enable awslogsd
                   iptables -A OUTPUT -m owner ! --uid-owner root -d 169.254.169.254 -j DROP
+                  service awslogsd start
+                  service enable awslogsd
               mode: '000500'
               owner: root
               group: root
@@ -101,7 +101,10 @@ Resources:
               httpd:
                 enabled: 'true'
                 ensureRunning: 'true'
-
+              awslogs:
+                enabled: 'true'
+                ensureRunning: 'true'
+                
     Properties:
       InstanceType: !Ref InstanceType
       ImageId: !FindInMap 
@@ -121,7 +124,7 @@ Resources:
         'Fn::Base64': !Sub |
           #!/bin/bash -ex
            yum update -y aws-cfn-bootstrap
-          /opt/aws/bin/cfn-init -v -s ${AWS::StackName} -r Ec2Instance --region ${AWS::Region}
+          /opt/aws/bin/cfn-init -v -s ${AWS::StackName} -r EC2Instance --region ${AWS::Region}
           { /home/ec2-user/configure-webserver.sh }
           
       SecurityGroups:
@@ -137,15 +140,15 @@ Resources:
   IPAssoc:
     Type: AWS::EC2::EIPAssociation
     Properties:
-      InstanceId: !Ref 'Ec2Instance'
+      InstanceId: !Ref 'EC2Instance'
       EIP: !Ref 'IPAddress'
       
 Outputs:
   InstanceId:
     Description: InstanceId of the EC2 instance
-    Value: !Ref Ec2Instance
+    Value: !Ref EC2Instance
   PublicIP:
     Description: Public IP address of the EC2 instance
     Value: !GetAtt 
-      - Ec2Instance
+      - EC2Instance
       - PublicIp
