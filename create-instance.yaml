@@ -80,12 +80,8 @@ Resources:
             "/home/ec2-user/configure-webserver.sh":
               content: !Sub |
                   #!/bin/bash
-                  service httpd start
-                  chkconfig httpd on
-                  sleep 5
                   git clone https://github.com/cloudacademy/static-website-example.git
                   cp -r static-website-example/* /var/www/html/
-                  sleep 2
                   sed -i 's/us-east-1/ap-southeast-2/g' /etc/awslogs/awscli.conf
                   sed -i '/^log_group_name/d' /etc/awslogs/awslogs.conf
                   sed -i '$s/$/\nlog_group_name = httpd/' /etc/awslogs/awslogs.conf
