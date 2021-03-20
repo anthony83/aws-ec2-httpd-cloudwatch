@@ -2,9 +2,12 @@
 
 templatepath="file:////home/anthonyn/devops/aws/httpd-cloudwatch-logging-ec2/create-instance.yaml"
 region="ap-southeast-2"
-stackname="createinstance"
+#stackname="stackname"
 keyname="httpd-server"
 sleeptime=45
+
+read -p "enter stackname " stackname
+
 
 aws cloudformation create-stack --stack-name $stackname --template-body $templatepath --parameters ParameterKey=KeyPairName,ParameterValue=$keyname --capabilities CAPABILITY_NAMED_IAM --output table
 

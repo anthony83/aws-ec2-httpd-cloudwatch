@@ -5,7 +5,7 @@ Parameters:
   InstanceType:
     Description: EC2 instance type
     Type: String
-    Default: t2.micro
+    Default: t2.micro    	
 
 #  InstanceImageId:
 #    Description: EC2 Image Id from this region
@@ -68,12 +68,48 @@ Resources:
           
   Ec2Instance:
     Type: AWS::EC2::Instance
+    Metadata:
+      AWS::CloudFormation::Init:
+        config:
+          packages:
+            yum:
+              httpd: []
+              git: []
+              awslogs: []
+          files:
+            "/home/ec2-user/configure-webserver.sh":
+              content: !Sub |
+                  #!/bin/bash
+                  service httpd start
+                  chkconfig httpd on
+                  sleep 5
+                  git clone https://github.com/cloudacademy/static-website-example.git
+                  cp -r static-website-example/* /var/www/html/
+                  sleep 2
+                  sed -i 's/us-east-1/ap-southeast-2/g' /etc/awslogs/awscli.conf
+                  sed -i '/^log_group_name/d' /etc/awslogs/awslogs.conf
+                  sed -i '$s/$/\nlog_group_name = httpd/' /etc/awslogs/awslogs.conf
+                  service awslogsd start
+                  systemctl enable awslogsd    
+              mode: '000500'
+              owner: root
+              group: root
+          commands:
+            1-install-servces:
+              command: !Sub |
+               /home/ec2-user/configure-webserver.sh
+          services:
+            sysvinit:
+              httpd:
+                enabled: 'true'
+                ensureRunning: 'true'
+
     Properties:
       InstanceType: !Ref InstanceType
       ImageId: !FindInMap 
         - RegionMap
         - !Ref 'AWS::Region'
-        - AMI
+        - AMI    
       IamInstanceProfile: !Ref EC2InstanceProfile  
       KeyName: !Ref KeyPairName
       BlockDeviceMappings:
@@ -84,25 +120,12 @@ Resources:
             DeleteOnTermination: 'true'
             Encrypted: 'true'
       UserData:
-        Fn::Base64: |
-            #!/bin/bash -xe
-            iptables -A OUTPUT -m owner ! --uid-owner root -d 169.254.169.254 -j DROP
-            yum update -y
-            yum install -y httpd
-            yum install -y git
-            service httpd start
-            chkconfig httpd on
-            yum install -y awslogs
-            sed -i 's/us-east-1/ap-southeast-2/g' /etc/awslogs/awscli.conf
-            sed -i '/^log_group_name/d' /etc/awslogs/awslogs.conf
-            sed -i '$s/$/\nlog_group_name = httpd/' /etc/awslogs/awslogs.conf
-            sleep 5
-            git clone https://github.com/cloudacademy/static-website-example.git
-            cp -r static-website-example/* /var/www/html/
-            sleep 5
-            service awslogsd start
-            systemctl enable awslogsd         
- 
+        'Fn::Base64': !Sub |
+          #!/bin/bash -ex
+           yum update -y aws-cfn-bootstrap
+          /opt/aws/bin/cfn-init -v -s ${AWS::StackName} -r Ec2Instance --region ${AWS::Region}
+          { /home/ec2-user/configure-webserver.sh }
+          
       SecurityGroups:
         - !Ref EC2SecurityGroup
       Tags:
