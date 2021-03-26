@@ -13,7 +13,7 @@
 <p>./create-instance-make.sh -c testinfrabuild</p>
 <p>ot</p>
 <p>./create-instance-make.sh -d testinfrabuild</p>
-<p>Its my attempt at speeding up continuous delivery.</p>
+<p>Its my attempt at streamlining continuous delivery.</p>
 <p>&nbsp;</p>
 <p>note: Cloudwatch log group is called httpd</p>
 <p>Usefull resource for info on debuggin cfn-init:</p>
