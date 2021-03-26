@@ -8,6 +8,13 @@
 <li>Script execution</li>
 </ul>
 <p>You can launch via Cloudformation directly (uploading the template), alternatively i have setup a seperate shell script if you would prefer to launch via bash.</p>
+<p>Ensure create-instance-make.sh is set so it can be executed and apply either the -c (to create) or -d (to delete)</p>
+<p>eg.</p>
+<p>./create-instance-make.sh -c testinfrabuild</p>
+<p>ot</p>
+<p>./create-instance-make.sh -d testinfrabuild</p>
+<p>Its my attempt at speeding up continuous delivery.</p>
+<p>&nbsp;</p>
 <p>note: Cloudwatch log group is called httpd</p>
 <p>Usefull resource for info on debuggin cfn-init:</p>
 <p><a href="https://lono.cloud/docs/configsets/debugging/">https://lono.cloud/docs/configsets/debugging/</a></p>
